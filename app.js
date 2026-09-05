@@ -1,7 +1,7 @@
 /**
  * ALIENTA ROJINEGRO — APLICACIÓN PRINCIPAL
- * Lógica en Vanilla JS: renderizado de catálogo, carruseles, scroll reveal y WhatsApp.
- * Sin dependencias externas ni frameworks.
+ * Lógica en Vanilla JS: renderizado de catálogo, carruseles de alto rendimiento,
+ * carga diferida y WhatsApp.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,7 +34,7 @@ async function initApp() {
   // 2. Aplicar configuraciones globales (WhatsApp, textos, redes sociales)
   applyConfiguration(catalogo.config || {});
 
-  // 3. Renderizar catálogo de productos
+  // 3. Renderizar catálogo de productos con carga ultrarrápida
   renderProducts(catalogo.productos || [], catalogo.config || {});
 }
 
@@ -119,7 +119,7 @@ function applyConfiguration(config) {
     footerCopy.textContent = `© ${currentYear} Alienta Rojinegro. Todos los derechos reservados.`;
   }
 
-  // Redes Sociales en Footer (únicamente si tienen URL válida)
+  // Redes Sociales en Footer
   renderSocialLinks(config);
 }
 
@@ -166,7 +166,21 @@ function renderSocialLinks(config) {
 }
 
 /**
- * Renderiza las tarjetas de productos con numeración editorial y carruseles
+ * Carga de forma segura imágenes secundarias de un carrusel
+ */
+function loadCardDeferredImages(card) {
+  const deferredImgs = card.querySelectorAll('img[data-src]');
+  deferredImgs.forEach(img => {
+    const realSrc = img.getAttribute('data-src');
+    if (realSrc) {
+      img.src = realSrc;
+      img.removeAttribute('data-src');
+    }
+  });
+}
+
+/**
+ * Renderiza las tarjetas de productos optimizadas
  */
 function renderProducts(productos, config) {
   const grid = document.getElementById('products-grid');
@@ -191,7 +205,7 @@ function renderProducts(productos, config) {
     // Numeración editorial (01, 02, 03...)
     const numEditorial = String(index + 1).padStart(2, '0');
 
-    // Enlace directo a WhatsApp con mensaje automático de compra
+    // Enlace directo a WhatsApp con mensaje de compra
     const waText = encodeURIComponent(`Hola, quiero comprar ${producto.nombre}.`);
     const waUrl = `https://wa.me/${whatsapp}?text=${waText}`;
 
@@ -202,7 +216,7 @@ function renderProducts(productos, config) {
     let mediaHTML = '';
 
     if (totalImgs <= 1) {
-      const imgSrc = imagenes[0] || 'Imagenes/hero/HERO.png';
+      const imgSrc = imagenes[0] || 'assets/optimized/hero/HERO.jpg';
       mediaHTML = `
         <div class="card-media">
           <img 
@@ -215,18 +229,36 @@ function renderProducts(productos, config) {
         </div>
       `;
     } else {
-      // Carrusel interactivo automático (sin etiqueta "X FOTOS")
-      const slidesHTML = imagenes.map(img => `
-        <div class="carousel-slide">
-          <img 
-            src="${img}" 
-            alt="${producto.nombre}" 
-            class="card-img" 
-            loading="lazy" 
-            decoding="async"
-          >
-        </div>
-      `).join('');
+      // Optimización de carrusel:
+      // La foto 0 carga de inmediato. Las fotos 1..N tienen carga diferida instantánea al interactuar.
+      const slidesHTML = imagenes.map((img, i) => {
+        if (i === 0) {
+          return `
+            <div class="carousel-slide">
+              <img 
+                src="${img}" 
+                alt="${producto.nombre}" 
+                class="card-img" 
+                loading="${index < 3 ? 'eager' : 'lazy'}" 
+                decoding="async"
+              >
+            </div>
+          `;
+        } else {
+          return `
+            <div class="carousel-slide">
+              <img 
+                data-src="${img}" 
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+                alt="${producto.nombre}" 
+                class="card-img" 
+                loading="lazy" 
+                decoding="async"
+              >
+            </div>
+          `;
+        }
+      }).join('');
 
       const dotsHTML = imagenes.map((_, i) => `
         <span class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>
@@ -269,14 +301,23 @@ function renderProducts(productos, config) {
       </div>
     `;
 
+    // Cargar imágenes secundarias al posar el cursor o tocar la tarjeta
+    card.addEventListener('mouseenter', () => loadCardDeferredImages(card), { once: true });
+    card.addEventListener('touchstart', () => loadCardDeferredImages(card), { once: true, passive: true });
+
     grid.appendChild(card);
   });
 
   // Inicializar eventos de carrusel
   initCarousels();
 
-  // Inicializar microinteracción de scroll reveal en tarjetas
+  // Inicializar scroll reveal en tarjetas
   initProductScrollReveal();
+
+  // Precargar suavemente el resto de fotos en segundo plano tras 1.8 segundos
+  window.setTimeout(() => {
+    document.querySelectorAll('.product-card').forEach(loadCardDeferredImages);
+  }, 1800);
 }
 
 /**
@@ -286,6 +327,7 @@ function initCarousels() {
   const containers = document.querySelectorAll('.carousel-container');
 
   containers.forEach(container => {
+    const card = container.closest('.product-card');
     const track = container.querySelector('.carousel-track');
     const prevBtn = container.querySelector('.carousel-nav-btn.prev');
     const nextBtn = container.querySelector('.carousel-nav-btn.next');
@@ -318,6 +360,7 @@ function initCarousels() {
       nextBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (card) loadCardDeferredImages(card);
         const slideWidth = track.clientWidth;
         track.scrollBy({ left: slideWidth, behavior: 'smooth' });
       });
@@ -328,6 +371,7 @@ function initCarousels() {
       prevBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (card) loadCardDeferredImages(card);
         const slideWidth = track.clientWidth;
         track.scrollBy({ left: -slideWidth, behavior: 'smooth' });
       });

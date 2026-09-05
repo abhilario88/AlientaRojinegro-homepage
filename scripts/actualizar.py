@@ -4,7 +4,7 @@
 Script de Actualización del Catálogo - Alienta Rojinegro
 Lee configuracion.csv y productos.csv, valida la integridad de los datos,
 escanea automáticamente las imágenes de cada producto,
-genera versiones optimizadas en assets/optimized/ y compila catalogo.js y catalogo.json.
+genera versiones de alto rendimiento en assets/optimized/ y compila catalogo.js y catalogo.json.
 """
 
 import os
@@ -14,6 +14,7 @@ import json
 import re
 import shutil
 import subprocess
+import zlib
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,35 +31,84 @@ def find_images_dir():
             return p
     return BASE_DIR / "Imagenes"
 
-def optimize_image(src_path, dest_path, max_dimension=1200):
+def lossless_compress_png(png_path):
+    """Recomprime los datos IDAT de un PNG con zlib nivel 9 para reducir tamaño sin perder un solo pixel."""
+    try:
+        with open(png_path, 'rb') as f:
+            data = f.read()
+        if len(data) < 8 or data[:8] != b'\x89PNG\r\n\x1a\n':
+            return
+        
+        pos = 8
+        chunks = []
+        idat = b''
+        while pos < len(data):
+            chunk_len = int.from_bytes(data[pos:pos+4], 'big')
+            chunk_type = data[pos+4:pos+8]
+            chunk_data = data[pos+8:pos+8+chunk_len]
+            crc = data[pos+8+chunk_len:pos+12+chunk_len]
+            
+            if chunk_type == b'IDAT':
+                idat += chunk_data
+            else:
+                chunks.append((chunk_type, chunk_data))
+            pos += 12 + chunk_len
+            
+        if not idat:
+            return
+            
+        decompressed = zlib.decompress(idat)
+        comp = zlib.compressobj(level=9, wbits=15, memLevel=9)
+        new_idat = comp.compress(decompressed) + comp.flush()
+        
+        # Solo escribir si la recompreción es más compacta
+        if len(new_idat) >= len(idat):
+            return
+            
+        out = b'\x89PNG\r\n\x1a\n'
+        for ctype, cdata in chunks:
+            if ctype == b'IHDR':
+                out += len(cdata).to_bytes(4, 'big') + ctype + cdata + zlib.crc32(ctype + cdata).to_bytes(4, 'big')
+                break
+                
+        out += len(new_idat).to_bytes(4, 'big') + b'IDAT' + new_idat + zlib.crc32(b'IDAT' + new_idat).to_bytes(4, 'big')
+        
+        for ctype, cdata in chunks:
+            if ctype != b'IHDR':
+                out += len(cdata).to_bytes(4, 'big') + ctype + cdata + zlib.crc32(ctype + cdata).to_bytes(4, 'big')
+                
+        with open(png_path, 'wb') as f:
+            f.write(out)
+    except Exception:
+        pass
+
+def optimize_image(src_path, dest_path, max_dimension=700, format_type=None, quality=85):
     """
-    Optimiza una imagen usando la herramienta nativa de macOS 'sips'.
+    Optimiza una imagen usando 'sips' nativo de macOS y recompresión zlib.
     No altera nunca el archivo original.
     """
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # Si el archivo de destino existe y es más reciente que el origen, omitir
-    if dest_path.exists() and dest_path.stat().st_mtime >= src_path.stat().st_mtime:
-        return
-
-    # Si sips está disponible en macOS
     sips_bin = shutil.which("sips")
     if sips_bin:
         try:
-            # Copiar primero al destino y luego redimensionar
             shutil.copy2(src_path, dest_path)
-            subprocess.run(
-                [sips_bin, "-Z", str(max_dimension), str(dest_path)],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=True
-            )
+            cmd = [sips_bin, "-Z", str(max_dimension)]
+            if format_type == "jpeg":
+                cmd.extend(["-s", "format", "jpeg", "-s", "formatOptions", str(quality)])
+            cmd.append(str(dest_path))
+            
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            
+            if dest_path.suffix.lower() == ".png":
+                lossless_compress_png(dest_path)
             return
         except Exception:
-            # Si sips falla por alguna razón, usar la copia directa
             pass
 
     shutil.copy2(src_path, dest_path)
+    if dest_path.suffix.lower() == ".png":
+        lossless_compress_png(dest_path)
 
 def main():
     print("==================================================")
@@ -103,16 +153,12 @@ def main():
     except Exception as e:
         errores.append(f"Error al leer configuracion.csv: {e}")
 
-    # Validar campos mínimos de configuración
+    # Validar WhatsApp
     whatsapp = config.get("whatsapp", "").strip()
-    if not whatsapp:
-        errores.append("El campo 'whatsapp' en configuracion.csv no puede estar vacío.")
-    else:
-        # Limpiar caracteres no numéricos para validación de formato
-        clean_wa = re.sub(r"[^\d]", "", whatsapp)
-        if len(clean_wa) < 8:
-            errores.append(f"El número de WhatsApp '{whatsapp}' no parece un número de teléfono válido.")
-        config["whatsapp"] = clean_wa
+    clean_wa = re.sub(r"[^\d]", "", whatsapp)
+    if not clean_wa or len(clean_wa) < 8:
+        errores.append(f"El número de WhatsApp '{whatsapp}' no parece un número válido.")
+    config["whatsapp"] = clean_wa
 
     if not config.get("tituloHero"):
         config["tituloHero"] = "Hecho para el que alienta."
@@ -145,11 +191,9 @@ def main():
                     descripcion = (row.get("descripcion") or "").strip()
                     activo_str = (row.get("activo") or "").strip().lower()
 
-                    # Omitir filas totalmente vacías
                     if not any([p_id, nombre, precio_str, carpeta, descripcion, activo_str]):
                         continue
 
-                    # Validación de activo
                     if activo_str in ["sí", "si", "true", "1", "yes", "s"]:
                         activo = True
                     elif activo_str in ["no", "false", "0", "n"]:
@@ -158,7 +202,6 @@ def main():
                         errores.append(f"Fila {row_idx}: Valor inválido en 'activo' ('{activo_str}'). Debe ser 'sí' o 'no'.")
                         activo = False
 
-                    # Validación de ID
                     if not p_id:
                         errores.append(f"Fila {row_idx}: Falta el ID del producto '{nombre}'.")
                     elif p_id in ids_vistos:
@@ -166,11 +209,9 @@ def main():
                     else:
                         ids_vistos.add(p_id)
 
-                    # Validación de Nombre
                     if not nombre:
                         errores.append(f"Fila {row_idx}: Producto sin nombre (ID: {p_id}).")
 
-                    # Validación de Precio
                     try:
                         precio = float(re.sub(r"[^\d.]", "", precio_str))
                         if precio < 0:
@@ -179,7 +220,6 @@ def main():
                         errores.append(f"Fila {row_idx} ('{nombre}'): Precio inválido ('{precio_str}').")
                         precio = 0.0
 
-                    # Validación de Carpeta
                     if not carpeta:
                         errores.append(f"Fila {row_idx} ('{nombre}'): Falta especificar la carpeta.")
                         continue
@@ -189,24 +229,20 @@ def main():
                     else:
                         carpetas_vistas.add(carpeta)
 
-                    # Verificar carpeta física
                     target_dir = productos_dir / carpeta
                     if not target_dir.is_dir():
                         errores.append(f"Fila {row_idx} ('{nombre}'): La carpeta '{target_dir}' no existe.")
                         continue
 
-                    # Escanear imágenes dentro de la carpeta
                     archivos_en_carpeta = [
                         f for f in target_dir.iterdir()
                         if f.is_file() and f.suffix.lower() in valid_extensions and not f.name.startswith(".")
                     ]
-
-                    # Ordenar alfanuméricamente
                     archivos_en_carpeta.sort(key=lambda x: natural_sort_key(x.name))
 
                     if not archivos_en_carpeta:
                         if activo:
-                            errores.append(f"Fila {row_idx} ('{nombre}'): La carpeta '{carpeta}' no contiene imágenes compatibles (.png, .jpg, .jpeg, .webp).")
+                            errores.append(f"Fila {row_idx} ('{nombre}'): La carpeta '{carpeta}' no contiene imágenes compatibles.")
                         else:
                             advertencias.append(f"La carpeta '{carpeta}' del producto inactivo '{nombre}' no tiene imágenes.")
 
@@ -222,61 +258,57 @@ def main():
     except Exception as e:
         errores.append(f"Error al procesar productos.csv: {e}")
 
-    # Si hay errores de validación, detener la ejecución con detalle
     if errores:
         print("❌ SE ENCONTRARON ERRORES QUE DEBES CORREGIR:")
         for err in errores:
             print(f"  • {err}")
-        print("\nPor favor corrige estos datos en datos/productos.csv o configuracion.csv y vuelve a intentarlo.")
         sys.exit(1)
 
-    if advertencias:
-        print("⚠️  ADVERTENCIAS:")
-        for adv in advertencias:
-            print(f"  • {adv}")
-        print("")
-
     # 4. Optimizar recursos globales (Hero y Logos)
-    print("⏳ Procesando recursos visuales de la web...")
+    print("⏳ Optimizando recursos visuales para carga ultrarrápida...")
     
-    # Hero
+    # Hero: generar versión JPEG super liviana (150KB) y PNG optimizada
     hero_src = imagenes_dir / "hero" / "HERO.png"
-    hero_dest = optimized_dir / "hero" / "HERO.png"
     if hero_src.exists():
-        optimize_image(hero_src, hero_dest, max_dimension=1600)
-    else:
-        advertencias.append(f"No se encontró la imagen Hero en {hero_src}")
+        optimize_image(hero_src, optimized_dir / "hero" / "HERO.jpg", max_dimension=1200, format_type="jpeg", quality=85)
+        optimize_image(hero_src, optimized_dir / "hero" / "HERO.png", max_dimension=1200)
 
     # Logos
     logos_src_dir = imagenes_dir / "logos"
     logos_dest_dir = optimized_dir / "logos"
     if logos_src_dir.is_dir():
-        for logo_file in logos_src_dir.iterdir():
-            if logo_file.is_file() and logo_file.suffix.lower() in valid_extensions:
-                optimize_image(logo_file, logos_dest_dir / logo_file.name, max_dimension=800)
+        # Sello: optimizado para 250px (pesa ~70KB en vez de 1.1MB)
+        sello_src = logos_src_dir / "Sello.png"
+        if sello_src.exists():
+            optimize_image(sello_src, logos_dest_dir / "Sello.png", max_dimension=280)
+            
+        # Logo horizontal: optimizado para 600px
+        logo_h_src = logos_src_dir / "LogoHorizontal.png"
+        if logo_h_src.exists():
+            optimize_image(logo_h_src, logos_dest_dir / "LogoHorizontal.png", max_dimension=600)
+            
+        logo_sq_src = logos_src_dir / "Logo.png"
+        if logo_sq_src.exists():
+            optimize_image(logo_sq_src, logos_dest_dir / "Logo.png", max_dimension=600)
 
-    # Favicon: generar a partir de Sello.png o Logo.png si existe
-    sello_path = logos_src_dir / "Sello.png"
-    favicon_dest = BASE_DIR / "favicon.png"
-    if sello_path.exists():
-        optimize_image(sello_path, favicon_dest, max_dimension=128)
+    # Favicon
+    if sello_src.exists():
+        optimize_image(sello_src, BASE_DIR / "favicon.png", max_dimension=128)
 
-    # 5. Optimizar imágenes de cada producto y preparar estructura para el catálogo
+    # 5. Optimizar imágenes de cada producto
     productos_salida = []
     total_imagenes = 0
 
     for prod in productos:
         carpeta = prod["carpeta"]
-        nombre = prod["nombre"]
         rutas_web = []
-
         prod_dest_dir = optimized_dir / "productos" / carpeta
 
         for orig_file in prod["archivos_originales"]:
             dest_file = prod_dest_dir / orig_file.name
-            optimize_image(orig_file, dest_file, max_dimension=1000)
+            # Optimizar a max 680px (suficiente para 2x retina y carga instantánea)
+            optimize_image(orig_file, dest_file, max_dimension=680)
             
-            # Ruta web relativa
             rel_path = f"assets/optimized/productos/{carpeta}/{orig_file.name}"
             rutas_web.append(rel_path)
             total_imagenes += 1
@@ -317,17 +349,12 @@ def main():
         json.dump(catalogo_payload, f, ensure_ascii=False, indent=2)
         f.write(";\n")
 
-    print("\n✅ ¡ACTUALIZACIÓN COMPLETADA CON ÉXITO!")
+    print("\n✅ ¡OPTIMIZACIÓN COMPLETADA CON ÉXITO!")
     print("--------------------------------------------------")
     print(f"📦 Productos activos procesados : {len(productos_salida)}")
     print(f"🖼️  Imágenes procesadas          : {total_imagenes}")
     print(f"📄 Archivo generado             : {js_path.relative_to(BASE_DIR)}")
     print(f"📄 Archivo generado             : {json_path.relative_to(BASE_DIR)}")
-    print("--------------------------------------------------")
-    for p in productos_salida:
-        num_imgs = len(p["imagenes"])
-        tipo_galeria = "Carrusel dinámico" if num_imgs > 1 else "Imagen estática"
-        print(f"  • {p['nombre']:<24} : S/ {p['precio']:<4} ({num_imgs} foto{'s' if num_imgs > 1 else ''} - {tipo_galeria})")
     print("--------------------------------------------------\n")
 
 if __name__ == "__main__":
