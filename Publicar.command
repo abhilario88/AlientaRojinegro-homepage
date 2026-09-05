@@ -14,39 +14,36 @@ if [ ! -d ".git" ]; then
     git branch -M main
 fi
 
+BRANCH_ACTUAL=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+
 # Agregar todos los cambios
 git add .
 
-# Verificar si hay cambios preparados para commit
-if git diff --cached --quiet; then
-    echo "✨ No hay cambios nuevos detectados en el catálogo ni en las imágenes."
-    echo "Tu web ya está al día."
-else
+# Verificar si hay cambios locales preparados para commit
+if ! git diff --cached --quiet; then
     FECHA=$(date '+%Y-%m-%d %H:%M')
     echo "📝 Guardando cambios con mensaje: 'Actualización catálogo $FECHA'..."
     git commit -m "Actualización catálogo $FECHA"
+else
+    echo "✨ Todos los archivos locales ya estaban guardados."
+fi
 
-    # Verificar si existe un repositorio remoto configurado
-    if git remote | grep -q 'origin'; then
-        echo "🚀 Subiendo cambios al repositorio remoto (git push)..."
-        BRANCH_ACTUAL=$(git rev-parse --abbrev-ref HEAD)
-        git push -u origin "$BRANCH_ACTUAL"
-        
-        if [ $? -eq 0 ]; then
-            echo ""
-            echo "🎉 ¡Publicación exitosa! Los cambios estarán visibles en tu sitio en unos minutos."
-        else
-            echo ""
-            echo "⚠️ Ocurrió un inconveniente al hacer git push."
-            echo "Verifica tu conexión a Internet o los permisos de tu repositorio en GitHub/GitLab."
-        fi
+# Sincronizar siempre con el repositorio remoto
+if git remote | grep -q 'origin'; then
+    echo "🚀 Sincronizando con GitHub (git push origin $BRANCH_ACTUAL)..."
+    git push -u origin "$BRANCH_ACTUAL"
+    
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo "🎉 ¡Publicación exitosa! Tu repositorio y tu web en Cloudflare están actualizados."
     else
         echo ""
-        echo "ℹ️ Los cambios locales se guardaron correctamente en Git."
-        echo "Para publicar automáticamente en la nube (Cloudflare Pages), configura tu repositorio remoto:"
-        echo "  git remote add origin <URL_DE_TU_REPOSITORIO>"
-        echo "  git push -u origin main"
+        echo "⚠️ Ocurrió un inconveniente al hacer git push."
+        echo "Verifica tu conexión a Internet o permisos de GitHub."
     fi
+else
+    echo ""
+    echo "ℹ️ No se detectó un repositorio remoto configurado."
 fi
 
 echo ""
