@@ -1,6 +1,6 @@
 /**
  * ALIENTA ROJINEGRO — APLICACIÓN PRINCIPAL
- * Lógica pura en Vanilla JS: renderizado de catálogo, carruseles y WhatsApp.
+ * Lógica en Vanilla JS: renderizado de catálogo, carruseles, scroll reveal y WhatsApp.
  * Sin dependencias externas ni frameworks.
  */
 
@@ -31,7 +31,7 @@ async function initApp() {
     return;
   }
 
-  // 2. Aplicar configuraciones globales
+  // 2. Aplicar configuraciones globales (WhatsApp, textos, redes sociales)
   applyConfiguration(catalogo.config || {});
 
   // 3. Renderizar catálogo de productos
@@ -39,10 +39,42 @@ async function initApp() {
 }
 
 /**
+ * Normaliza y construye URLs seguras para redes sociales
+ */
+function resolveSocialUrl(network, rawValue) {
+  if (!rawValue) return null;
+  const val = rawValue.trim();
+  if (!val) return null;
+
+  // Si ya es una URL completa válida
+  if (val.startsWith('http://') || val.startsWith('https://')) {
+    return val;
+  }
+
+  // Si es un nombre de usuario en Instagram o TikTok
+  if (network === 'instagram') {
+    const cleanUser = val.replace(/^@/, '');
+    return `https://instagram.com/${cleanUser}`;
+  }
+
+  if (network === 'tiktok') {
+    const cleanUser = val.replace(/^@/, '');
+    return `https://tiktok.com/@${cleanUser}`;
+  }
+
+  // Para Facebook, no inventar URL basándose solo en nombre si no es enlace
+  if (network === 'facebook') {
+    return null;
+  }
+
+  return null;
+}
+
+/**
  * Aplica los textos y enlaces globales definidos en configuracion.csv
  */
 function applyConfiguration(config) {
-  const whatsapp = config.whatsapp || '51959740166';
+  const whatsapp = (config.whatsapp || '51967031999').replace(/[^\d]/g, '');
 
   // Textos Hero
   const heroTitle = document.getElementById('hero-title');
@@ -55,16 +87,29 @@ function applyConfiguration(config) {
     heroSubtitle.textContent = config.textoHero;
   }
 
-  const heroCtaText = document.getElementById('hero-cta-text');
-  if (heroCtaText && config.ctaHero) {
-    heroCtaText.textContent = config.ctaHero;
+  // CTA Hero con una sola flecha limpia
+  const heroCtaBtn = document.getElementById('hero-cta-btn');
+  if (heroCtaBtn) {
+    let ctaText = (config.ctaHero || 'VER PRODUCTOS →').trim();
+    if (!ctaText.includes('→') && !ctaText.includes('->')) {
+      ctaText += ' →';
+    }
+    heroCtaBtn.textContent = ctaText;
   }
+
+  // Mensaje general acordado para el Header y el CTA Final
+  const generalMsg = encodeURIComponent('Hola, vengo de la página de Alienta Rojinegro y quisiera información sobre sus productos.');
 
   // Enlace WhatsApp del Header
   const headerWaBtn = document.getElementById('header-whatsapp-btn');
   if (headerWaBtn) {
-    const defaultMsg = encodeURIComponent('Hola, quiero información sobre los productos de Alienta Rojinegro.');
-    headerWaBtn.href = `https://wa.me/${whatsapp}?text=${defaultMsg}`;
+    headerWaBtn.href = `https://wa.me/${whatsapp}?text=${generalMsg}`;
+  }
+
+  // Enlace WhatsApp de la Sección Final
+  const finalWaBtn = document.getElementById('final-whatsapp-btn');
+  if (finalWaBtn) {
+    finalWaBtn.href = `https://wa.me/${whatsapp}?text=${generalMsg}`;
   }
 
   // Copyright dinámico
@@ -74,12 +119,12 @@ function applyConfiguration(config) {
     footerCopy.textContent = `© ${currentYear} Alienta Rojinegro. Todos los derechos reservados.`;
   }
 
-  // Redes Sociales en Footer
+  // Redes Sociales en Footer (únicamente si tienen URL válida)
   renderSocialLinks(config);
 }
 
 /**
- * Renderiza los iconos de redes sociales únicamente si tienen URL configurada
+ * Renderiza los iconos de redes sociales en el footer
  */
 function renderSocialLinks(config) {
   const container = document.getElementById('footer-social');
@@ -89,27 +134,27 @@ function renderSocialLinks(config) {
 
   const redes = [
     {
+      key: 'tiktok',
+      name: 'TikTok',
+      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>`
+    },
+    {
       key: 'instagram',
       name: 'Instagram',
-      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`
+      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`
     },
     {
       key: 'facebook',
       name: 'Facebook',
-      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>`
-    },
-    {
-      key: 'tiktok',
-      name: 'TikTok',
-      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>`
+      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>`
     }
   ];
 
   redes.forEach(red => {
-    const url = config[red.key];
-    if (url && url.trim() !== '') {
+    const resolvedUrl = resolveSocialUrl(red.key, config[red.key]);
+    if (resolvedUrl) {
       const a = document.createElement('a');
-      a.href = url.trim();
+      a.href = resolvedUrl;
       a.className = 'social-link';
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
@@ -121,7 +166,7 @@ function renderSocialLinks(config) {
 }
 
 /**
- * Renderiza las tarjetas de productos en la cuadrícula
+ * Renderiza las tarjetas de productos con numeración editorial y carruseles
  */
 function renderProducts(productos, config) {
   const grid = document.getElementById('products-grid');
@@ -137,17 +182,20 @@ function renderProducts(productos, config) {
   }
 
   grid.innerHTML = '';
-  const whatsapp = config.whatsapp || '51959740166';
+  const whatsapp = (config.whatsapp || '51967031999').replace(/[^\d]/g, '');
 
   productos.forEach((producto, index) => {
     const card = document.createElement('article');
     card.className = 'product-card';
 
-    // Generar enlace directo a WhatsApp con mensaje personalizado
+    // Numeración editorial (01, 02, 03...)
+    const numEditorial = String(index + 1).padStart(2, '0');
+
+    // Enlace directo a WhatsApp con mensaje automático de compra
     const waText = encodeURIComponent(`Hola, quiero comprar ${producto.nombre}.`);
     const waUrl = `https://wa.me/${whatsapp}?text=${waText}`;
 
-    // Construcción del contenedor de medios (imagen o carrusel)
+    // Construcción del contenedor visual
     const imagenes = producto.imagenes || [];
     const totalImgs = imagenes.length;
 
@@ -167,7 +215,7 @@ function renderProducts(productos, config) {
         </div>
       `;
     } else {
-      // Carrusel interactivo automático para productos con múltiples fotos
+      // Carrusel interactivo automático (sin etiqueta "X FOTOS")
       const slidesHTML = imagenes.map(img => `
         <div class="carousel-slide">
           <img 
@@ -186,7 +234,6 @@ function renderProducts(productos, config) {
 
       mediaHTML = `
         <div class="card-media carousel-container" data-product-id="${producto.id}">
-          <span class="badge-multiphoto">${totalImgs} FOTOS</span>
           <button class="carousel-nav-btn prev" aria-label="Foto anterior" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
@@ -203,10 +250,13 @@ function renderProducts(productos, config) {
       `;
     }
 
-    // Contenido textual y botón de compra
+    // Contenido textual con numeración editorial discreta
     card.innerHTML = `
       ${mediaHTML}
       <div class="card-content">
+        <div class="card-meta-top">
+          <span class="product-number">${numEditorial}</span>
+        </div>
         <div class="card-header-row">
           <h3 class="product-name">${producto.nombre}</h3>
           <span class="product-price">S/ ${producto.precio}</span>
@@ -214,7 +264,7 @@ function renderProducts(productos, config) {
         <p class="product-desc">${producto.descripcion || ''}</p>
         <a href="${waUrl}" class="btn-buy" target="_blank" rel="noopener noreferrer" aria-label="Comprar ${producto.nombre} por WhatsApp">
           <span>COMPRAR</span>
-          <svg class="icon-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          <span class="btn-arrow">→</span>
         </a>
       </div>
     `;
@@ -222,12 +272,15 @@ function renderProducts(productos, config) {
     grid.appendChild(card);
   });
 
-  // Inicializar eventos de carrusel después de agregar elementos al DOM
+  // Inicializar eventos de carrusel
   initCarousels();
+
+  // Inicializar microinteracción de scroll reveal en tarjetas
+  initProductScrollReveal();
 }
 
 /**
- * Inicializa los eventos de swipe, scroll y botones para todos los carruseles
+ * Inicializa los eventos de swipe, scroll y flechas para todos los carruseles
  */
 function initCarousels() {
   const containers = document.querySelectorAll('.carousel-container');
@@ -241,7 +294,7 @@ function initCarousels() {
 
     if (!track || slides.length <= 1) return;
 
-    // Actualizar indicador activo en base al desplazamiento
+    // Actualizar indicador activo en base al desplazamiento suave
     let isScrolling = null;
     track.addEventListener('scroll', () => {
       window.clearTimeout(isScrolling);
@@ -257,10 +310,10 @@ function initCarousels() {
             dot.classList.remove('active');
           }
         });
-      }, 50);
+      }, 40);
     }, { passive: true });
 
-    // Navegación con botón siguiente
+    // Navegación con flecha siguiente (Desktop)
     if (nextBtn) {
       nextBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -270,7 +323,7 @@ function initCarousels() {
       });
     }
 
-    // Navegación con botón anterior
+    // Navegación con flecha anterior (Desktop)
     if (prevBtn) {
       prevBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -280,6 +333,33 @@ function initCarousels() {
       });
     }
   });
+}
+
+/**
+ * Microinteracción: Revela suavemente las tarjetas de productos al entrar en viewport
+ */
+function initProductScrollReveal() {
+  const cards = document.querySelectorAll('.product-card');
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+    cards.forEach(card => card.classList.add('is-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null,
+    threshold: 0.1,
+    rootMargin: '0px 0px -30px 0px'
+  });
+
+  cards.forEach(card => observer.observe(card));
 }
 
 /**

@@ -20,13 +20,13 @@
   <!-- Tipografía Google Fonts con fallback nativo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
-  <!-- Header Sticky & Discreto -->
+  <!-- Header Sticky & Discreto con Logo de mayor presencia -->
   <header class="header" id="header">
     <div class="container header-inner">
       <a href="#inicio" class="logo-link" aria-label="Ir al inicio de Alienta Rojinegro">
@@ -37,7 +37,7 @@
         <a href="#productos" class="nav-link">Productos</a>
         <a href="#" id="header-whatsapp-btn" class="btn btn-header" target="_blank" rel="noopener noreferrer">
           <span>WhatsApp</span>
-          <svg class="icon-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          <span class="btn-arrow">→</span>
         </a>
       </nav>
     </div>
@@ -49,20 +49,20 @@
     <section class="hero-section" id="inicio">
       <div class="container hero-grid">
         <div class="hero-content">
-          <span class="hero-badge">EDICIÓN EXCLUSIVA</span>
           <h1 class="hero-title" id="hero-title">Hecho para el que alienta.</h1>
           <p class="hero-subtitle" id="hero-subtitle">Productos rojinegros para llevar tu pasión a todas partes.</p>
           <div class="hero-actions">
-            <a href="#productos" class="btn btn-primary" id="hero-cta-btn">
-              <span id="hero-cta-text">VER PRODUCTOS</span>
-              <svg class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
+            <a href="#productos" class="btn btn-primary" id="hero-cta-btn">VER PRODUCTOS →</a>
           </div>
         </div>
         
         <div class="hero-visual">
           <div class="hero-image-wrapper">
             <img src="assets/optimized/hero/HERO.png" alt="Figura de colección Alienta Rojinegro" class="hero-image" fetchpriority="high" onerror="this.src='Imagenes/hero/HERO.png'">
+            <!-- Logo integrado dentro de la composición fotográfica Hero -->
+            <div class="hero-overlay-logo-container">
+              <img src="assets/optimized/logos/LogoHorizontal.png" alt="Alienta Rojinegro" class="hero-overlay-logo" onerror="this.src='Imagenes/logos/LogoHorizontal.png'">
+            </div>
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@
       <div class="container">
         <header class="section-header">
           <div class="section-tag">// CATÁLOGO OFICIAL</div>
-          <h2 class="section-title">FIGURAS & COLECCIÓN</h2>
+          <h2 class="section-title">COLECCIÓN ROJINEGRA</h2>
           <p class="section-description">Piezas dedicadas a la hinchada y al sentimiento rojinegro. Selecciona tu favorita y ordénala al instante.</p>
         </header>
 
@@ -88,32 +88,31 @@
       </div>
     </section>
 
-    <!-- Manifiesto de Marca Sobrio y Editorial -->
-    <section class="brand-manifesto">
-      <div class="container manifesto-inner">
-        <div class="manifesto-seal">
-          <img src="assets/optimized/logos/Sello.png" alt="Sello Alienta Rojinegro" class="seal-img" onerror="this.src='Imagenes/logos/Sello.png'">
-        </div>
-        <div class="manifesto-text">
-          <p class="manifesto-quote">“La pasión no se explica, se lleva en el pecho y en cada rincón.”</p>
-          <p class="manifesto-caption">Diseño, detalle y orgullo arequipeño en cada pieza.</p>
-        </div>
+    <!-- Sección Comercial Final / Cierre de Compra -->
+    <section class="final-cta-section" id="contacto">
+      <div class="container final-cta-inner">
+        <h2 class="final-cta-title">¿LISTO PARA ALENTAR?</h2>
+        <p class="final-cta-subtitle">Productos hechos para llevar los colores contigo.</p>
+        <a href="#" id="final-whatsapp-btn" class="btn btn-primary btn-final-cta" target="_blank" rel="noopener noreferrer">
+          COMPRAR POR WHATSAPP →
+        </a>
       </div>
     </section>
 
   </main>
 
-  <!-- Footer Mínimo y Elegante -->
+  <!-- Footer Compacto y Elegante con Sello Oficial -->
   <footer class="footer">
     <div class="container footer-inner">
-      <div class="footer-brand">
-        <img src="assets/optimized/logos/LogoHorizontal.png" alt="Alienta Rojinegro" class="footer-logo" onerror="this.src='Imagenes/logos/LogoHorizontal.png'">
-        <p class="footer-copy" id="footer-copy">© 2026 Alienta Rojinegro. Todos los derechos reservados.</p>
-      </div>
+      <a href="#inicio" class="footer-brand-link" aria-label="Volver arriba">
+        <img src="assets/optimized/logos/Sello.png" alt="Sello Alienta Rojinegro" class="footer-seal" onerror="this.src='Imagenes/logos/Sello.png'">
+      </a>
 
       <div class="footer-social" id="footer-social">
         <!-- Generado dinámicamente según configuración -->
       </div>
+
+      <p class="footer-copy" id="footer-copy">© 2026 Alienta Rojinegro. Todos los derechos reservados.</p>
     </div>
   </footer>
 

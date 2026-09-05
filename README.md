@@ -59,7 +59,7 @@ Guía rápida para actualizar, administrar y publicar la web de forma 100% autó
 1. Abre `datos/configuracion.csv`.
 2. En la fila `whatsapp`, cambia el valor numérico con tu código de país y número (sin espacios ni signos `+`):
    ```csv
-   whatsapp,51959740166
+   whatsapp,51967031999
    ```
 3. Guarda el archivo y haz doble clic en **`Actualizar.command`**. Todos los botones de compra se actualizarán automáticamente.
 
@@ -68,13 +68,12 @@ Guía rápida para actualizar, administrar y publicar la web de forma 100% autó
 ## 7. Cómo cambiar redes sociales
 
 1. Abre `datos/configuracion.csv`.
-2. Modifica o pega los enlaces completos de tus redes sociales:
+2. Modifica los nombres de usuario o enlaces de tus redes sociales:
    ```csv
-   instagram,https://instagram.com/alientarojinegro
-   facebook,https://facebook.com/alientarojinegro
-   tiktok,https://tiktok.com/@alientarojinegro
-   ```
-   - *Si dejas una red vacía (por ejemplo `facebook,`), ese icono no se mostrará en la web.*
+   instagram,Alienta.Rojinegro
+   tiktok,Alienta.Rojinegro
+   facebook,https://facebook.com/tu-pagina-real
+   - *Si dejas una red vacía (por ejemplo `facebook,`), ese icono no se mostrará en el footer.*
 3. Guarda el archivo y haz doble clic en **`Actualizar.command`**.
 
 ---
