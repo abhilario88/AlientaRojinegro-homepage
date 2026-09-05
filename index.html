@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alienta Rojinegro — Pasión y Colección Rojinegra</title>
+  <meta name="description" content="Landing page oficial de Alienta Rojinegro. Productos y figuras de colección rojinegras hechas para el que alienta. Compra directa y personalizada por WhatsApp.">
+  <link rel="canonical" href="https://alientarojinegro.com/">
+  
+  <!-- Open Graph / Meta Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://alientarojinegro.com/">
+  <meta property="og:title" content="Alienta Rojinegro — Pasión Rojinegra">
+  <meta property="og:description" content="Productos rojinegros para llevar tu pasión a todas partes. Catálogo exclusivo con compra directa por WhatsApp.">
+  <meta property="og:image" content="assets/optimized/hero/HERO.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  
+  <!-- Tipografía Google Fonts con fallback nativo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <!-- Header Sticky & Discreto -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="#inicio" class="logo-link" aria-label="Ir al inicio de Alienta Rojinegro">
+        <img src="assets/optimized/logos/LogoHorizontal.png" alt="Alienta Rojinegro Logo" class="logo-img" onerror="this.src='Imagenes/logos/LogoHorizontal.png'">
+      </a>
+      
+      <nav class="nav-links">
+        <a href="#productos" class="nav-link">Productos</a>
+        <a href="#" id="header-whatsapp-btn" class="btn btn-header" target="_blank" rel="noopener noreferrer">
+          <span>WhatsApp</span>
+          <svg class="icon-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    
+    <!-- Hero Section Editorial -->
+    <section class="hero-section" id="inicio">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="hero-badge">EDICIÓN EXCLUSIVA</span>
+          <h1 class="hero-title" id="hero-title">Hecho para el que alienta.</h1>
+          <p class="hero-subtitle" id="hero-subtitle">Productos rojinegros para llevar tu pasión a todas partes.</p>
+          <div class="hero-actions">
+            <a href="#productos" class="btn btn-primary" id="hero-cta-btn">
+              <span id="hero-cta-text">VER PRODUCTOS</span>
+              <svg class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="hero-image-wrapper">
+            <img src="assets/optimized/hero/HERO.png" alt="Figura de colección Alienta Rojinegro" class="hero-image" fetchpriority="high" onerror="this.src='Imagenes/hero/HERO.png'">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Catálogo -->
+    <section class="catalog-section" id="productos">
+      <div class="container">
+        <header class="section-header">
+          <div class="section-tag">// CATÁLOGO OFICIAL</div>
+          <h2 class="section-title">FIGURAS & COLECCIÓN</h2>
+          <p class="section-description">Piezas dedicadas a la hinchada y al sentimiento rojinegro. Selecciona tu favorita y ordénala al instante.</p>
+        </header>
+
+        <!-- Grid de Productos -->
+        <div class="products-grid" id="products-grid">
+          <!-- Renderizado dinámico vía JavaScript -->
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Cargando catálogo...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manifiesto de Marca Sobrio y Editorial -->
+    <section class="brand-manifesto">
+      <div class="container manifesto-inner">
+        <div class="manifesto-seal">
+          <img src="assets/optimized/logos/Sello.png" alt="Sello Alienta Rojinegro" class="seal-img" onerror="this.src='Imagenes/logos/Sello.png'">
+        </div>
+        <div class="manifesto-text">
+          <p class="manifesto-quote">“La pasión no se explica, se lleva en el pecho y en cada rincón.”</p>
+          <p class="manifesto-caption">Diseño, detalle y orgullo arequipeño en cada pieza.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Mínimo y Elegante -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="assets/optimized/logos/LogoHorizontal.png" alt="Alienta Rojinegro" class="footer-logo" onerror="this.src='Imagenes/logos/LogoHorizontal.png'">
+        <p class="footer-copy" id="footer-copy">© 2026 Alienta Rojinegro. Todos los derechos reservados.</p>
+      </div>
+
+      <div class="footer-social" id="footer-social">
+        <!-- Generado dinámicamente según configuración -->
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- 1. Carga de datos compilados (permite funcionamiento 100% offline y sin bloqueo CORS) -->
+  <script src="datos/catalogo.js"></script>
+  <!-- 2. Lógica interactiva de carrusel, swipe táctil y WhatsApp -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alientarojinegro.com/sitemap.xml
