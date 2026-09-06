@@ -14,7 +14,7 @@ window.CATALOGO_DATA = {
     {
       "id": "1",
       "nombre": "León Rojinegro",
-      "precio": 60,
+      "precio": 50,
       "carpeta": "1. Leon",
       "descripcion": "Figura decorativa de león rojinegro con gran detalle",
       "imagenes": [
@@ -23,18 +23,8 @@ window.CATALOGO_DATA = {
     },
     {
       "id": "2",
-      "nombre": "Mini Camiseta",
-      "precio": 30,
-      "carpeta": "2. Mini Camiseta",
-      "descripcion": "Mini camiseta rojinegra para colgar o exhibir con orgullo",
-      "imagenes": [
-        "assets/optimized/productos/2. Mini Camiseta/MiniCamiseta.png"
-      ]
-    },
-    {
-      "id": "3",
       "nombre": "Portalápiz Rojinegro",
-      "precio": 35,
+      "precio": 40,
       "carpeta": "3. Portalapiz",
       "descripcion": "Portalápiz decorativo rojinegro en varios colores",
       "imagenes": [
@@ -45,48 +35,7 @@ window.CATALOGO_DATA = {
       ]
     },
     {
-      "id": "4",
-      "nombre": "Escultura Papá",
-      "precio": 50,
-      "carpeta": "4. EsculturaPapa",
-      "descripcion": "Escultura temática del hincha rojinegro",
-      "imagenes": [
-        "assets/optimized/productos/4. EsculturaPapa/EsculturaPapa.png"
-      ]
-    },
-    {
-      "id": "5",
-      "nombre": "Berni Cuesta Rojinegro",
-      "precio": 55,
-      "carpeta": "5. Berni Rojinegro",
-      "descripcion": "Figura homenaje al goleador e ídolo rojinegro",
-      "imagenes": [
-        "assets/optimized/productos/5. Berni Rojinegro/Cuesta.png"
-      ]
-    },
-    {
-      "id": "6",
-      "nombre": "Hincha con Bandera",
-      "precio": 45,
-      "carpeta": "6. Hincha con Bandera",
-      "descripcion": "Escultura del hincha flameando la bandera rojinegra",
-      "imagenes": [
-        "assets/optimized/productos/6. Hincha con Bandera/HinchaBandera.png"
-      ]
-    },
-    {
-      "id": "7",
-      "nombre": "Papá e Hijos",
-      "precio": 65,
-      "carpeta": "8. Papa e Hijos",
-      "descripcion": "Escultura familiar rojinegra para compartir la pasión",
-      "imagenes": [
-        "assets/optimized/productos/8. Papa e Hijos/PapaHija.png",
-        "assets/optimized/productos/8. Papa e Hijos/PapaHijo.png"
-      ]
-    },
-    {
-      "id": "8",
+      "id": "3",
       "nombre": "Modo Rojinegro",
       "precio": 45,
       "carpeta": "9. modo Rojinegro",
@@ -96,9 +45,9 @@ window.CATALOGO_DATA = {
       ]
     },
     {
-      "id": "9",
+      "id": "4",
       "nombre": "El Aliento",
-      "precio": 45,
+      "precio": 50,
       "carpeta": "10. El aliento",
       "descripcion": "Hincha rojinegro en diferentes poses de tribuna",
       "imagenes": [
@@ -108,6 +57,67 @@ window.CATALOGO_DATA = {
         "assets/optimized/productos/10. El aliento/Hincha4.png",
         "assets/optimized/productos/10. El aliento/Hincha5.png",
         "assets/optimized/productos/10. El aliento/Hincha6.png"
+      ]
+    },
+    {
+      "id": "5",
+      "nombre": "Papá e Hijos",
+      "precio": 70,
+      "carpeta": "8. Papa e Hijos",
+      "descripcion": "Escultura familiar rojinegra para compartir la pasión",
+      "imagenes": [
+        "assets/optimized/productos/8. Papa e Hijos/PapaHija.png",
+        "assets/optimized/productos/8. Papa e Hijos/PapaHijo.png"
+      ]
+    },
+    {
+      "id": "6",
+      "nombre": "Berni Cuesta Rojinegro",
+      "precio": 100,
+      "carpeta": "5. Berni Rojinegro",
+      "descripcion": "Figura homenaje al goleador e ídolo rojinegro. 20 cm",
+      "imagenes": [
+        "assets/optimized/productos/5. Berni Rojinegro/Cuesta.png"
+      ]
+    },
+    {
+      "id": "7",
+      "nombre": "Hincha con Bandera",
+      "precio": 100,
+      "carpeta": "6. Hincha con Bandera",
+      "descripcion": "Escultura del hincha flameando la bandera rojinegra. 22 cm",
+      "imagenes": [
+        "assets/optimized/productos/6. Hincha con Bandera/HinchaBandera.png"
+      ]
+    },
+    {
+      "id": "8",
+      "nombre": "Escultura Papá",
+      "precio": 120,
+      "carpeta": "4. EsculturaPapa",
+      "descripcion": "Escultura temática del hincha rojinegro. 22 cm",
+      "imagenes": [
+        "assets/optimized/productos/4. EsculturaPapa/EsculturaPapa.png"
+      ]
+    },
+    {
+      "id": "9",
+      "nombre": "Mini Camiseta",
+      "precio": 120,
+      "carpeta": "2. Mini Camiseta",
+      "descripcion": "Mini camiseta rojinegra para exhibir con orgullo. 22 cm",
+      "imagenes": [
+        "assets/optimized/productos/2. Mini Camiseta/MiniCamiseta.png"
+      ]
+    },
+    {
+      "id": "10",
+      "nombre": "León Rojinegro XL",
+      "precio": 120,
+      "carpeta": "11. Leon Grande",
+      "descripcion": "Figura decorativa de león rojinegro con gran detalle. 22 cm",
+      "imagenes": [
+        "assets/optimized/productos/11. Leon Grande/LeonUrbano.png"
       ]
     }
   ]
