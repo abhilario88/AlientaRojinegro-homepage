@@ -119,6 +119,16 @@ window.CATALOGO_DATA = {
       "imagenes": [
         "assets/optimized/productos/11. Leon Grande/LeonUrbano.png"
       ]
+    },
+    {
+      "id": "11",
+      "nombre": "Chapu Rojinegro",
+      "precio": 120,
+      "carpeta": "12. Chapu Rojinegro",
+      "descripcion": "Figura homenaje al goleador rojinegro. 26 cm",
+      "imagenes": [
+        "assets/optimized/productos/12. Chapu Rojinegro/Chapu01.png"
+      ]
     }
   ]
 };
