@@ -7,6 +7,11 @@ echo "    Publicando cambios en Alienta Rojinegro        "
 echo "=================================================="
 echo ""
 
+# Limpiar index.lock huérfano si existiera por un proceso previo interrumpido
+if [ -f ".git/index.lock" ]; then
+    rm -f ".git/index.lock" 2>/dev/null
+fi
+
 # Verificar si git está inicializado
 if [ ! -d ".git" ]; then
     echo "⚠️ Repositorio Git no inicializado. Inicializando ahora..."
@@ -16,26 +21,29 @@ fi
 
 BRANCH_ACTUAL=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 
-# Agregar todos los cambios
-git add .
+# Agregar todos los cambios (incluyendo nuevos y borrados)
+git add -A
 
-# Verificar si hay cambios locales preparados para commit
-if ! git diff --cached --quiet; then
+# Verificar si hay cambios locales preparados para commit o pendientes
+if ! git diff --cached --quiet || [ -n "$(git status --porcelain)" ]; then
+    git add -A
     FECHA=$(date '+%Y-%m-%d %H:%M')
     echo "📝 Guardando cambios con mensaje: 'Actualización catálogo $FECHA'..."
     git commit -m "Actualización catálogo $FECHA"
 else
-    echo "✨ Todos los archivos locales ya estaban guardados."
+    echo "✨ Todos los archivos locales ya estaban guardados en el commit actual."
 fi
 
 # Sincronizar siempre con el repositorio remoto
 if git remote | grep -q 'origin'; then
-    echo "🚀 Sincronizando con GitHub (git push origin $BRANCH_ACTUAL)..."
+    echo "🚀 Sincronizando con GitHub y Cloudflare (git push origin $BRANCH_ACTUAL)..."
     git push -u origin "$BRANCH_ACTUAL"
     
     if [ $? -eq 0 ]; then
         echo ""
-        echo "🎉 ¡Publicación exitosa! Tu repositorio y tu web en Cloudflare están actualizados."
+        echo "🎉 ¡Publicación exitosa!"
+        echo "Último cambio publicado: $(git log -1 --pretty=%B)"
+        echo "Tu web en Cloudflare (https://alientarojinegro.com) se actualizará automáticamente en 30-60 segundos."
     else
         echo ""
         echo "⚠️ Ocurrió un inconveniente al hacer git push."
