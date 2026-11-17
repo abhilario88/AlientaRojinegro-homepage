@@ -129,6 +129,46 @@ window.CATALOGO_DATA = {
       "imagenes": [
         "assets/optimized/productos/12. Chapu Rojinegro/Chapu01.png"
       ]
+    },
+    {
+      "id": "12",
+      "nombre": "Berni Rojinegro",
+      "precio": 120,
+      "carpeta": "14. Berni Rojinegro Bailarin",
+      "descripcion": "Figura homenaje al goleador e ídolo rojinegro. 26 cm",
+      "imagenes": [
+        "assets/optimized/productos/14. Berni Rojinegro Bailarin/Berni01.png"
+      ]
+    },
+    {
+      "id": "13",
+      "nombre": "Mini Chapu Rojinegro",
+      "precio": 60,
+      "carpeta": "13. Mini Chapu Rojinegro",
+      "descripcion": "Figura homenaje al goleador rojinegro. 15 cm",
+      "imagenes": [
+        "assets/optimized/productos/13. Mini Chapu Rojinegro/MiniChapu01.png"
+      ]
+    },
+    {
+      "id": "14",
+      "nombre": "Mini Berni Rojinegro",
+      "precio": 60,
+      "carpeta": "15. Mini Berni Rojinegro Bailarin",
+      "descripcion": "Figura homenaje al goleador e ídolo rojinegro. 15 cm",
+      "imagenes": [
+        "assets/optimized/productos/15. Mini Berni Rojinegro Bailarin/MiniBerni01.png"
+      ]
+    },
+    {
+      "id": "15",
+      "nombre": "Dupla Goleadora",
+      "precio": 110,
+      "carpeta": "16. Dupla Goleadora",
+      "descripcion": "Figuras de los goleadores rojinegros. 15 cm",
+      "imagenes": [
+        "assets/optimized/productos/16. Dupla Goleadora/Dupla01.png"
+      ]
     }
   ]
 };
